@@ -1,4 +1,9 @@
 # 1340-Group-Project
+### Group Member Info
+    Name        UID
+    Guo Minzhe  3035812335
+    Deng Jiaqi  3035832490
+
 
 ### Game—Airplane Attacks.
 
