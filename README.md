@@ -1,7 +1,7 @@
 # SkyLapse
 A 2D air combat game
 
-### Group Member Info
+### Group Members Info
     Name        UID
     Guo Minzhe  3035812335
     Deng Jiaqi  3035832490
@@ -26,9 +26,9 @@ A 2D air combat game
 
 - **Program codes in multiple files**
     
-    Different functionalities are stored in respective files. For example, the attributes and movements of enemies and the player are seperated into `<enemy.cpp>` and `<player.cpp>` for documentation and maintainance. `<main.cpp>` does the integration.
+    Different functionalities are stored in respective files. For example, the attributes and movements of enemies and the player are seperated into `<enemy.cpp>` and `player.cpp` for documentation and maintainance. `main.cpp` does the integration.
 
 - **File input/output**
     - load the game by compiling the c program and running the executable
     - AD and space keys serve will be read by the program, which makes according effects on the screen
-    - when the game ends, your score and best score so far will be displayed
+    - When the game ends, your score and best score so far will be displayed
