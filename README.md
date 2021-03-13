@@ -1,11 +1,10 @@
-# 1340-Group-Project
+# SkyLapse
+A 2D air combat game
+
 ### Group Member Info
     Name        UID
     Guo Minzhe  3035812335
     Deng Jiaqi  3035832490
-
-
-### Game—Airplane Attacks.
 
 ### How to Play and Rules
 
@@ -26,13 +25,8 @@
 - **Dynamic memory management**
 
 - **Program codes in multiple files**
-    - setup.h
-    - health pills.h
-    - attack.h
-    - airplane agents.h
-    - main.c
-    - color.h
-    - sound.h
+    
+    Different functionalities are stored in respective files. For example, the attributes and movements of enemies and the player are seperated into `<enemy.cpp>` and `<player.cpp>` for documentation and maintainance. `<main.cpp>` does the integration.
 
 - **File input/output**
     - load the game by compiling the c program and running the executable
