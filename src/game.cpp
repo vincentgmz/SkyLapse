@@ -1,7 +1,37 @@
 # include <ncurses.h>
 # include <iostream>
 # include <string>
+# include <unistd.h>
+# include "game.h"
 using namespace std;
+
+struct
+{
+    position pos;
+    char symbol;
+} player;
+
+
+struct 
+{
+
+    int top;
+    int bot;
+    int left;
+    int right;
+
+} MAIN_AREA;
+
+struct 
+{
+    int top;
+    int bot;
+    int left;
+    int right;
+
+} INFO_AREA;
+
+
 
 /*
 void printS(int& y,int& x)
@@ -92,7 +122,8 @@ int main(int argc, char const *argv[])
     cbreak();
     noecho();
     curs_set(0);
-    keypad(stdscr,TRUE);
+    keypad(stdscr,true);
+    nodelay(stdscr,true);
     int maxX, maxY;
 
     getmaxyx(stdscr,maxY,maxX); 
@@ -105,14 +136,89 @@ int main(int argc, char const *argv[])
     int startx = 0;
 
     //create the main game window
-    WINDOW* planeWin = createNewWin(height, width, starty, startx, false);
+    WINDOW* main = createNewWin(height, width, starty, startx, false);
 
     starty = height;
     height = maxY / 3;
 
     //create the data window
-    WINDOW* dataWin = createNewWin(height, width, starty, startx, true);
+    WINDOW* info = createNewWin(height, width, starty, startx, true);
 
+    wrefresh(main);
+    MAIN_AREA = {0,16,0,80};
+    INFO_AREA = {16,24,0,80};
+
+    player.pos.x = 5;
+    player.pos.y = 5;
+    player.symbol = 'E';
+
+    mvwaddch(main,player.pos.y,player.pos.x,player.symbol);
+    
+    
+    bool exit = false;
+    while (true)
+    {
+        
+        char input_key;
+        input_key = wgetch(main);
+
+        switch (input_key)
+        {
+        case 'w':
+            if (player.pos.y > MAIN_AREA.top)
+            {
+                mvwaddch(main,player.pos.y,player.pos.x,' ');
+                player.pos.y -= 1;
+            }
+            break;
+        
+        case 's':
+            if (player.pos.y < MAIN_AREA.bot)
+            {
+                mvwaddch(main,player.pos.y,player.pos.x,' ');
+                player.pos.y += 1;
+            }
+            break;
+        
+        case 'a':
+            if (player.pos.x > MAIN_AREA.left)
+            {
+                mvwaddch(main,player.pos.y,player.pos.x,' ');
+                player.pos.x -= 1;
+            }
+            break;
+
+        case 'd':
+            if (player.pos.x < MAIN_AREA.right)
+            {
+                mvwaddch(main,player.pos.y,player.pos.x,' ');
+                player.pos.x += 1;
+            }
+            break;
+
+        case 'q':
+            exit = true;
+            break;
+
+        default:
+            break;
+        }
+
+        if (exit)
+        {
+            break;
+        }
+
+        mvwaddch(main,player.pos.y,player.pos.x,player.symbol);
+        
+        wrefresh(main);
+
+        usleep(10000);
+
+    }
+        
+    wrefresh(main);
+    
 
     getch();
     endwin();
