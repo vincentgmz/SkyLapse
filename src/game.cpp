@@ -3,6 +3,7 @@
 # include <string>
 # include <unistd.h>
 # include "game.h"
+# include <ctime>
 using namespace std;
 
 struct
@@ -10,27 +11,6 @@ struct
     position pos;
     char symbol;
 } player;
-
-
-struct 
-{
-
-    int top;
-    int bot;
-    int left;
-    int right;
-
-} MAIN_AREA;
-
-struct 
-{
-    int top;
-    int bot;
-    int left;
-    int right;
-
-} INFO_AREA;
-
 
 
 /*
@@ -89,6 +69,7 @@ void printK(int& y, int& x)
 }
 */
 
+
 /* this function creates windows for the main and sub one. 
 */
 WINDOW* createNewWin(int height, int width, int starty, int startx, bool isDataWin)
@@ -100,8 +81,7 @@ WINDOW* createNewWin(int height, int width, int starty, int startx, bool isDataW
     if (isDataWin == true)
     {
         int score = 0;
-        mvprintw(starty+1, startx+2, "Score: %d",score);
-        mvprintw(starty+1, startx+68,"Time: 00:00");
+        mvwaddstr(localWin, 1, 1, "Score: 0");
         starty += 2;
         startx += 2;
         //printS(starty, startx);
@@ -112,6 +92,33 @@ WINDOW* createNewWin(int height, int width, int starty, int startx, bool isDataW
 
     wrefresh(localWin);
     return localWin;
+}
+
+
+void showTime(int second, WINDOW* win){
+   int minute = second / 60;
+   second %= 60;
+   if (minute/10 == 0)
+   {
+       if (second / 10== 0){
+        mvwprintw(win, 1, 68,"Time: 0%d:0%d",minute,second);
+        }
+        else{
+            mvwprintw(win, 1, 68,"Time: 0%d:%d",minute,second);
+        }  
+   }
+   else{
+        if (second / 10== 0){
+        mvwprintw(win, 1, 68,"Time: %d:0%d",minute,second);
+        }
+        else{
+            mvwprintw(win, 1, 68,"Time: %d:%d",minute,second);
+        }
+       
+   }
+   
+   wrefresh(win);
+ 
 }
 
 
@@ -136,63 +143,69 @@ int main(int argc, char const *argv[])
     int startx = 0;
 
     //create the main game window
-    WINDOW* main = createNewWin(height, width, starty, startx, false);
+    WINDOW* MAIN = createNewWin(height, width, starty, startx, false);
 
     starty = height;
-    height = maxY / 3;
+    height = 8;
 
     //create the data window
-    WINDOW* info = createNewWin(height, width, starty, startx, true);
-
-    wrefresh(main);
-    MAIN_AREA = {0,16,0,80};
-    INFO_AREA = {16,24,0,80};
-
+    WINDOW* INFO = createNewWin(height, width, starty, startx, true);
+    
+    nodelay(INFO,TRUE);
+    nodelay(MAIN,TRUE);
+    
+    //wrefresh(MAIN);
     player.pos.x = 5;
     player.pos.y = 5;
     player.symbol = 'E';
 
-    mvwaddch(main,player.pos.y,player.pos.x,player.symbol);
+    mvwaddch(MAIN,player.pos.y,player.pos.x,player.symbol);
     
-    
+    time_t start = time(NULL);
+
     bool exit = false;
     while (true)
-    {
+    {   
+        time_t now = time(NULL);
+        int passed = difftime(now,start);
+        showTime(passed,INFO);
+    
         
         char input_key;
-        input_key = wgetch(main);
-
+        input_key = wgetch(MAIN);
+        
+       
         switch (input_key)
         {
         case 'w':
-            if (player.pos.y > MAIN_AREA.top)
+            if (player.pos.y > MAIN_AREA.top + 1)
             {
-                mvwaddch(main,player.pos.y,player.pos.x,' ');
+                mvwaddch(MAIN,player.pos.y,player.pos.x,' ');
                 player.pos.y -= 1;
             }
             break;
         
         case 's':
-            if (player.pos.y < MAIN_AREA.bot)
+            if (player.pos.y < MAIN_AREA.bot - 1)
             {
-                mvwaddch(main,player.pos.y,player.pos.x,' ');
+                mvwaddch(MAIN,player.pos.y,player.pos.x,' ');
                 player.pos.y += 1;
             }
             break;
         
         case 'a':
-            if (player.pos.x > MAIN_AREA.left)
+            if (player.pos.x > MAIN_AREA.left + 2)
             {
-                mvwaddch(main,player.pos.y,player.pos.x,' ');
-                player.pos.x -= 1;
+                mvwaddch(MAIN,player.pos.y,player.pos.x,' ');
+                player.pos.x -= 2;
             }
             break;
 
         case 'd':
-            if (player.pos.x < MAIN_AREA.right)
+            if (player.pos.x < MAIN_AREA.right - 2)
             {
-                mvwaddch(main,player.pos.y,player.pos.x,' ');
-                player.pos.x += 1;
+                mvwaddch(MAIN,player.pos.y,player.pos.x,' ');
+                player.pos.x += 2;
             }
             break;
 
@@ -204,20 +217,20 @@ int main(int argc, char const *argv[])
             break;
         }
 
-        if (exit)
-        {
-            break;
-        }
+        if (exit) break;
 
-        mvwaddch(main,player.pos.y,player.pos.x,player.symbol);
+        mvwaddch(MAIN,player.pos.y,player.pos.x,player.symbol);
         
-        wrefresh(main);
+        wrefresh(MAIN);
+        wrefresh(INFO);
+
 
         usleep(10000);
 
     }
         
-    wrefresh(main);
+    wrefresh(MAIN);
+
     
 
     getch();
