@@ -4,6 +4,8 @@
 # include <unistd.h>
 # include "game.h"
 # include <ctime>
+# include "enemy.h"
+# include <cstdlib>
 using namespace std;
 
 struct
@@ -121,6 +123,26 @@ void showTime(int second, WINDOW* win){
  
 }
 
+void printEnemy(WINDOW* win){
+
+    mvwprintw(win,e1.y,e1.x,"*");
+    mvwprintw(win,e2.y,e2.x,"*");
+    mvwprintw(win,e3.y,e3.x,"*");
+    mvwprintw(win,e4.y,e4.x,"*");
+    mvwprintw(win,e5.y,e5.x,"*");
+    mvwprintw(win,e6.y,e6.x,"*");  
+
+}
+
+void eraseEnemy(WINDOW* win){
+    mvwprintw(win,e1.y,e1.x," ");
+    mvwprintw(win,e2.y,e2.x," ");
+    mvwprintw(win,e3.y,e3.x," ");
+    mvwprintw(win,e4.y,e4.x," ");
+    mvwprintw(win,e5.y,e5.x," ");
+    mvwprintw(win,e6.y,e6.x," ");  
+
+}
 
 int main(int argc, char const *argv[])
 {
@@ -159,18 +181,23 @@ int main(int argc, char const *argv[])
     player.pos.y = 5;
     player.symbol = 'E';
 
+
+
+
     mvwaddch(MAIN,player.pos.y,player.pos.x,player.symbol);
     
     time_t start = time(NULL);
-
+    srand(time(0));
     bool exit = false;
+
     while (true)
     {   
         time_t now = time(NULL);
         int passed = difftime(now,start);
         showTime(passed,INFO);
-    
+
         
+       
         char input_key;
         input_key = wgetch(MAIN);
         
@@ -216,6 +243,10 @@ int main(int argc, char const *argv[])
         default:
             break;
         }
+        
+        printEnemy(MAIN);
+
+      
 
         if (exit) break;
 
@@ -225,8 +256,43 @@ int main(int argc, char const *argv[])
         wrefresh(INFO);
 
 
-        usleep(10000);
+        usleep(20000);
 
+        eraseEnemy(MAIN);
+
+        e1.x--;
+        e2.x--;
+        e3.x--;
+        e4.x--;
+        e5.x--;
+        e6.x--;
+        
+        if (e1.x == 0)
+        {
+            e1 = {rand()%14+1,78,'*'};
+        }
+        if (e2.x == 0)
+        {
+            e2 = {rand()%14+1,78,'*'};
+        }
+        if (e3.x == 0)
+        {
+            e3 = {rand()%14+1,78,'*'};
+        }
+        if (e4.x == 0)
+        {
+            e4 = {rand()%14+1,78,'*'};
+        }
+        if (e5.x == 0)
+        {
+            e5 = {rand()%14+1,78,'*'};
+        }
+        if (e6.x == 0)
+        {
+            e6 = {rand()%14+1,78,'*'};
+        }
+      
+        
     }
         
     wrefresh(MAIN);
