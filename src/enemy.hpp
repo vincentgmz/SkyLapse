@@ -2,7 +2,6 @@ struct Enemy{
     int y;
     int x;
     char shape;
-    int speed;
 }; 
 
 void printEnemy(WINDOW* win);
