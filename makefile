@@ -1,4 +1,10 @@
-all: game
+all: bin/main
 
-game: src/game.cpp
-	g++ -pedantic-errors -std=c++11 -lncurses -o bin/game src/game.cpp
+bin/main : bin/game.o bin/enemy.o
+	g++ -o bin/main bin/game.o bin/enemy.o -lncurses -std=c++11 -pedantic-errors
+
+bin/game.o: src/game.cpp src/game.h src/enemy.hpp
+	g++ -c -o bin/game.o src/game.cpp
+
+bin/enemy.o: src/enemy.cpp src/enemy.hpp
+	g++ -c -o bin/enemy.o src/enemy.cpp

@@ -4,7 +4,7 @@
 # include <unistd.h>
 # include "game.h"
 # include <ctime>
-# include "enemy.h"
+# include "enemy.hpp"
 # include <cstdlib>
 using namespace std;
 
@@ -123,27 +123,6 @@ void showTime(int second, WINDOW* win){
  
 }
 
-void printEnemy(WINDOW* win){
-
-    mvwprintw(win,e1.y,e1.x,"*");
-    mvwprintw(win,e2.y,e2.x,"*");
-    mvwprintw(win,e3.y,e3.x,"*");
-    mvwprintw(win,e4.y,e4.x,"*");
-    mvwprintw(win,e5.y,e5.x,"*");
-    mvwprintw(win,e6.y,e6.x,"*");  
-
-}
-
-void eraseEnemy(WINDOW* win){
-    mvwprintw(win,e1.y,e1.x," ");
-    mvwprintw(win,e2.y,e2.x," ");
-    mvwprintw(win,e3.y,e3.x," ");
-    mvwprintw(win,e4.y,e4.x," ");
-    mvwprintw(win,e5.y,e5.x," ");
-    mvwprintw(win,e6.y,e6.x," ");  
-
-}
-
 int main(int argc, char const *argv[])
 {
     initscr();
@@ -159,7 +138,7 @@ int main(int argc, char const *argv[])
     //mvprintw(0,0,"%d",maxY); //y=24
    // mvprintw(1,1,"%d", maxX); //x=80
 
-    int height =16 ;
+    int height =16;
     int width = 80;
     int starty = 0;
     int startx = 0;
@@ -186,9 +165,14 @@ int main(int argc, char const *argv[])
 
     mvwaddch(MAIN,player.pos.y,player.pos.x,player.symbol);
     
+
     time_t start = time(NULL);
     srand(time(0));
     bool exit = false;
+    int tick = 0;
+    int decelerate = 12;
+    int count = 0;
+    
 
     while (true)
     {   
@@ -244,9 +228,33 @@ int main(int argc, char const *argv[])
             break;
         }
         
-        printEnemy(MAIN);
+        //printEnemy(MAIN);
+        //string temp = to_string(passed);
+        mvwprintw(INFO,5,10,"%d",decelerate);
+        wrefresh(INFO);
 
-      
+        
+        if (count % 800 == 0 && decelerate!= 2)
+        {
+            if (decelerate<10)
+            {
+                decelerate--;
+            }else{
+                decelerate-=2;
+
+            }
+
+            count = 0;
+        }
+        
+        
+        if ( tick % decelerate == 0){
+            printEnemy(MAIN);
+        }
+        tick++;
+        count ++;
+        
+       
 
         if (exit) break;
 
@@ -255,43 +263,17 @@ int main(int argc, char const *argv[])
         wrefresh(MAIN);
         wrefresh(INFO);
 
-
-        usleep(20000);
-
-        eraseEnemy(MAIN);
-
-        e1.x--;
-        e2.x--;
-        e3.x--;
-        e4.x--;
-        e5.x--;
-        e6.x--;
         
-        if (e1.x == 0)
+        usleep(10000);
+
+        if (tick % decelerate ==0)
         {
-            e1 = {rand()%14+1,78,'*'};
+            eraseEnemy(MAIN);
+            
+            updateEnemyPos();
+            tick = 0;
         }
-        if (e2.x == 0)
-        {
-            e2 = {rand()%14+1,78,'*'};
-        }
-        if (e3.x == 0)
-        {
-            e3 = {rand()%14+1,78,'*'};
-        }
-        if (e4.x == 0)
-        {
-            e4 = {rand()%14+1,78,'*'};
-        }
-        if (e5.x == 0)
-        {
-            e5 = {rand()%14+1,78,'*'};
-        }
-        if (e6.x == 0)
-        {
-            e6 = {rand()%14+1,78,'*'};
-        }
-      
+        generateEnemy();
         
     }
         
