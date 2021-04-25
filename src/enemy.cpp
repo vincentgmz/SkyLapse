@@ -88,8 +88,8 @@ void enemyBullet(){
     {
         if (ENEMY_LIST[i].exist == true)
         {
-            srand(time(0));
-            int random_number = rand() % 10;
+            
+            int random_number = rand() % ENEMY_BULLET_GEN_RATE;
             if (random_number == 1)
             {
                 for (int j = 0; j < MAX_NUM_BULLET; j++)
