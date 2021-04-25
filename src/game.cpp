@@ -51,6 +51,11 @@ void CollisionCheck(){
 
     for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
+
+        if (BulletList[i].exist == false)
+        {
+            continue;
+        }
         for (int j = 0; j < MAX_NUM_ENEMY; j++)
         {
             if (ENEMY_LIST[j].exist == false){
@@ -78,18 +83,18 @@ void CollisionCheck(){
             }
         }
         
-         if (BulletList[i].pos.y == player.pos.y && BulletList[i].player == false)
-            {
-                if (abs(player.pos.x - BulletList[i].pos.x)/BulletList[i].speed < 1){
-                    if (player.hp == 0)
-                    {
-                        player.symbol = ' ';
-                    }
-                    BulletList[i].exist = false;
-                    
-                    player.hp --;
+        if (BulletList[i].pos.y == player.pos.y && BulletList[i].player == false)
+        {
+            if (abs(player.pos.x - BulletList[i].pos.x)/BulletList[i].speed < 1){
+                if (player.hp == 0)
+                {
+                    player.symbol = ' ';
                 }
+                BulletList[i].exist = false;
+                    
+                player.hp --;
             }
+        }
         
     }
     
@@ -383,10 +388,10 @@ int main(int argc, char const *argv[])
             tick++;
 
             if(player.hp == 0){
-                displayEndScr();
                 break;
             }
         }
+        displayEndScr();
         char b = getch();
         if (b =='r'){
             restart = true;
