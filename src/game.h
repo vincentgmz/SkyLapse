@@ -1,3 +1,30 @@
+#ifndef GAME_H
+#define GAME_H
+
+#define ENEMY_GEN_RATE 25
+#define MAX_NUM_ENEMY 10
+#define MAX_NUM_BULLET 50
+
+struct position
+{
+    int x;
+    int y;
+};
+
+struct
+{
+    position pos;
+    char symbol;
+} player;
+
+struct Bullet
+{
+    position pos;
+    char symbol;
+    bool exist;
+    int speed;
+};
+
 struct AREA
 {
 
@@ -8,12 +35,7 @@ struct AREA
 
 };
 
-AREA MAIN_AREA = {0,15,0,79};
-AREA INFO_AREA = {16,24,0,80};
+extern AREA MAIN_AREA;
+extern AREA INFO_AREA;
 
-struct position
-{
-    int x;
-    int y;
-
-};
+#endif

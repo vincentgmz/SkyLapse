@@ -4,72 +4,80 @@
 # include <unistd.h>
 # include "game.h"
 # include <ctime>
-# include "enemy.hpp"
+# include "enemy.h"
 # include <cstdlib>
+# include <list>
 using namespace std;
 
-struct
-{
-    position pos;
-    char symbol;
-} player;
+AREA MAIN_AREA = {0,15,0,79};
+AREA INFO_AREA = {16,24,0,80};
+Bullet BulletList[MAX_NUM_BULLET];
 
+void generateBullet(){
 
-/*
-void printS(int& y,int& x)
-{
-    int y_pos =y;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
         
-        mvprintw(y_pos,x+i,"*");
+        if (BulletList[i].exist == false)
+        {
+            BulletList[i].exist = true;
+            BulletList[i].pos.x = player.pos.x + 1;
+            BulletList[i].pos.y = player.pos.y;        
+            BulletList[i].symbol = '*';
+            BulletList[i].speed = 2;
+            break;
+        }
+
     }
-    for (int i = 0; i < 2; i++)
-    {
-        mvprintw(y_pos,x,"*");
-        y_pos++;
-        
-    }
-    for (int i = 0; i <4 ; i++)
-    {
-        mvprintw(y_pos,x+i,"*");
-    }
-    for (int i = 0; i < 2; i++)
-    {
-        mvprintw(y_pos,x+3,"*");
-        y_pos++;
-        
-    }
-    for (int i = 0; i < 4; i++)
-    {
-        mvprintw(y_pos,x+i,"*");
-    }
-    x += 8;
-     
     
 }
 
-void printK(int& y, int& x)
-{
+void printBullet(WINDOW* WIN){
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
-        mvprintw(y + i, x, "*");
+        
+        if (BulletList[i].exist == true)
+        {
+            mvwaddch(WIN, BulletList[i].pos.y, BulletList[i].pos.x, BulletList[i].symbol);   
+        }
+
     }
-    for (int i = 0; i < 2; i++)
-    {
-        mvprintw(y + 3 - i, x + 3 * i, "*");
-    }
-    for (int i = 0; i < 2; i++)
-    {
-        mvprintw(y + 3 + i, x + 3 * i, "*");
-    }
-    
-    x +=3;
-    
 
 }
-*/
+
+void updateBullet(){
+
+    for (int i = 0; i < MAX_NUM_BULLET; i++)
+    {
+
+        if (BulletList[i].exist == true)
+        {
+            BulletList[i].pos.x += BulletList[i].speed;
+
+            if (BulletList[i].pos.x >= MAIN_AREA.right)
+            {
+                BulletList[i].exist = false;
+            }
+        }
+
+    }
+    
+}
+
+void eraseBullet(WINDOW* WIN){
+
+    for (int i = 0; i < MAX_NUM_BULLET; i++)
+    {
+        
+        if (BulletList[i].exist == true)
+        {
+            mvwaddch(WIN, BulletList[i].pos.y, BulletList[i].pos.x, ' ');   
+        }
+
+    }
+
+}
 
 
 /* this function creates windows for the main and sub one. 
@@ -170,18 +178,30 @@ int main(int argc, char const *argv[])
     srand(time(0));
     bool exit = false;
     int tick = 0;
-    int decelerate = 12;
-    int count = 0;
-    
 
+    for (int i = 0; i < MAX_NUM_ENEMY; i++)
+    {
+        Enemy* temp = new Enemy;
+        temp->exist = false;
+        ENEMY_LIST[i] = *temp;
+
+    }
+    
+    for (int i = 0; i < MAX_NUM_BULLET; i++)
+    {
+        Bullet* temp = new Bullet;
+        temp->exist = false;
+        BulletList[i] = *temp;
+    }
+    
     while (true)
     {   
+
+        usleep(50000);   // Frame rate approximately 50 fps
+
         time_t now = time(NULL);
         int passed = difftime(now,start);
-        showTime(passed,INFO);
 
-        
-       
         char input_key;
         input_key = wgetch(MAIN);
         
@@ -220,6 +240,11 @@ int main(int argc, char const *argv[])
             }
             break;
 
+        // Space key reflects ' '
+        case ' ':
+            generateBullet();
+            break;
+        
         case 'q':
             exit = true;
             break;
@@ -228,52 +253,25 @@ int main(int argc, char const *argv[])
             break;
         }
         
-        //printEnemy(MAIN);
-        //string temp = to_string(passed);
-        mvwprintw(INFO,5,10,"%d",decelerate);
-        wrefresh(INFO);
-
-        
-        if (count % 800 == 0 && decelerate!= 2)
+        eraseEnemy(MAIN);
+        eraseBullet(MAIN);
+        updateEnemy();
+        updateBullet();
+        if (tick % ENEMY_GEN_RATE == 0)
         {
-            if (decelerate<10)
-            {
-                decelerate--;
-            }else{
-                decelerate-=2;
-
-            }
-
-            count = 0;
+            generateEnemy();
         }
-        
-        
-        if ( tick % decelerate == 0){
-            printEnemy(MAIN);
-        }
-        tick++;
-        count ++;
-        
-       
+        printEnemy(MAIN);
+        printBullet(MAIN);
 
         if (exit) break;
-
         mvwaddch(MAIN,player.pos.y,player.pos.x,player.symbol);
         
         wrefresh(MAIN);
         wrefresh(INFO);
 
-        
-        usleep(10000);
+        tick++;
 
-        if (tick % decelerate ==0)
-        {
-            eraseEnemy(MAIN);
-            
-            updateEnemyPos();
-            tick = 0;
-        }
-        generateEnemy();
         
     }
         
