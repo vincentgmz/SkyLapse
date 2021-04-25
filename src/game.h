@@ -3,7 +3,7 @@
 
 #define ENEMY_GEN_RATE 25
 #define MAX_NUM_ENEMY 10
-#define MAX_NUM_BULLET 50
+#define MAX_NUM_BULLET 100
 
 struct position
 {
@@ -23,6 +23,7 @@ struct Bullet
     char symbol;
     bool exist;
     int speed;
+    bool player;
 };
 
 struct AREA
@@ -37,5 +38,6 @@ struct AREA
 
 extern AREA MAIN_AREA;
 extern AREA INFO_AREA;
+extern Bullet BulletList[MAX_NUM_BULLET];
 
 #endif

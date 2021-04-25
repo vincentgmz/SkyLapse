@@ -82,4 +82,38 @@ void updateEnemy(){
 
 }
 
+void enemyBullet(){
+
+    for (int i = 0; i < MAX_NUM_ENEMY; i++)
+    {
+        if (ENEMY_LIST[i].exist == true)
+        {
+            srand(time(0));
+            int random_number = rand() % 10;
+            if (random_number == 1)
+            {
+                for (int j = 0; j < MAX_NUM_BULLET; j++)
+                {
+                    if (BulletList[j].exist == false){
+                        BulletList[j].exist = true;
+                        BulletList[j].player = false;
+                        BulletList[j].pos.x = ENEMY_LIST[i].pos.x - 1;
+                        BulletList[j].pos.y = ENEMY_LIST[i].pos.y;
+                        BulletList[j].symbol = '-';
+                        BulletList[j].speed = 2;
+                        break;
+                    }
+
+                }
+               
+            }
+        }
+        
+
+    }
+    
+}
+
+
+
 

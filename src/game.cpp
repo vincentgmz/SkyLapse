@@ -13,6 +13,26 @@ AREA MAIN_AREA = {0,15,0,79};
 AREA INFO_AREA = {16,24,0,80};
 Bullet BulletList[MAX_NUM_BULLET];
 
+void CollisionCheck(){
+
+    for (int i = 0; i < MAX_NUM_BULLET; i++)
+    {
+        for (int j = 0; j < MAX_NUM_ENEMY; j++)
+        {
+            if (ENEMY_LIST[j].pos.y == BulletList[i].pos.y && BulletList[i].player == true)
+            {
+                if ((ENEMY_LIST[j].pos.x - BulletList[i].pos.x) / BulletList[i].speed < 1)
+                {
+                    BulletList[i].exist = false;
+                    ENEMY_LIST[j].exist = false;
+                }
+                
+            }   
+        }
+    }
+    
+}
+
 void generateBullet(){
 
     for (int i = 0; i < MAX_NUM_BULLET; i++)
@@ -25,6 +45,7 @@ void generateBullet(){
             BulletList[i].pos.y = player.pos.y;        
             BulletList[i].symbol = '*';
             BulletList[i].speed = 2;
+            BulletList[i].player = true;
             break;
         }
 
@@ -51,11 +72,19 @@ void updateBullet(){
     for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
 
-        if (BulletList[i].exist == true)
+        if (BulletList[i].exist == true && BulletList[i].player == true)
         {
             BulletList[i].pos.x += BulletList[i].speed;
 
             if (BulletList[i].pos.x >= MAIN_AREA.right)
+            {
+                BulletList[i].exist = false;
+            }
+        }else if (BulletList[i].exist == true && BulletList[i].player == false)
+        {
+            BulletList[i].pos.x -= BulletList[i].speed;
+
+            if (BulletList[i].pos.x <= MAIN_AREA.left)
             {
                 BulletList[i].exist = false;
             }
@@ -94,10 +123,6 @@ WINDOW* createNewWin(int height, int width, int starty, int startx, bool isDataW
         mvwaddstr(localWin, 1, 1, "Score: 0");
         starty += 2;
         startx += 2;
-        //printS(starty, startx);
-        //printK(starty, startx);
-
-
     }
 
     wrefresh(localWin);
@@ -252,15 +277,18 @@ int main(int argc, char const *argv[])
         default:
             break;
         }
-        
+
         eraseEnemy(MAIN);
         eraseBullet(MAIN);
+
         updateEnemy();
         updateBullet();
+        CollisionCheck();
         if (tick % ENEMY_GEN_RATE == 0)
         {
             generateEnemy();
         }
+        enemyBullet();
         printEnemy(MAIN);
         printBullet(MAIN);
 

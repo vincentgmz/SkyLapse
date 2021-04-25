@@ -18,6 +18,7 @@ void generateEnemy();
 void printEnemy(WINDOW* WIN);
 void eraseEnemy(WINDOW* WIN);
 void updateEnemy();
+void enemyBullet();
 
 #endif
 
