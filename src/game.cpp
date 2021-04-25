@@ -24,8 +24,8 @@ void mv_print_file(string file_loc, int y, int x){
     fin.open(file_loc);
     string str;
     while(getline(fin, str)){
-        
        mvprintw(y,x,str.c_str()); 
+       y++;
     }
     fin.close();
 }
@@ -33,7 +33,7 @@ void mv_print_file(string file_loc, int y, int x){
 
 
 void displayIntroScr(){
-    mv_print_file("src/introScr.txt",1,2);
+    mv_print_file("src/introScr.txt",0,0);
     while (getch()!='p');
     clear();
 
@@ -42,7 +42,7 @@ void displayIntroScr(){
 void displayEndScr(){
     nodelay(stdscr, false);
     clear();
-    mv_print_file("src/endScr.txt",1,2);
+    mv_print_file("src/endScr.txt",0,0);
 }
 
 
