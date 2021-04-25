@@ -4,7 +4,6 @@
 #define ENEMY_GEN_RATE 25
 #define MAX_NUM_ENEMY 10
 #define MAX_NUM_BULLET 100
-
 struct position
 {
     int x;
@@ -15,6 +14,9 @@ struct
 {
     position pos;
     char symbol;
+    int hp;
+    bool exist;
+    int score;
 } player;
 
 struct Bullet
