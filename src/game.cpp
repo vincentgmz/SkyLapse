@@ -8,11 +8,58 @@
 # include <cstdlib>
 # include <list>
 # include <fstream>
+# include "boss.h"
 using namespace std;
 
+/*
+
+    PLAYER LOOKS LIKE
+    \
+    -)
+    /
+
+*/
+int base_health = 10;
+int ENEMY_GEN_RATE = 25;
+int boss_health = 50;
 AREA MAIN_AREA = {0,15,0,79};
 AREA INFO_AREA = {16,24,0,80};
 Bullet BulletList[MAX_NUM_BULLET];
+bool isBoss = false;
+
+void ultimate(WINDOW* WIN){
+
+    eraseEnemy(WIN);
+    for (size_t i = 0; i < MAX_NUM_ENEMY; i++)
+    {
+        if (ENEMY_LIST[i].exist == true)
+        {
+            player.score += 10;
+            ENEMY_LIST[i].exist = false;
+        }
+        
+    }
+    
+
+}
+
+void printPlayer(WINDOW* WIN){
+
+    mvwaddch(WIN, player.pos.y, player.pos.x, ')');
+    mvwaddch(WIN, player.pos.y, player.pos.x - 1, '-');
+    mvwaddch(WIN, player.pos.y + 1, player.pos.x - 1, '/');
+    mvwaddch(WIN, player.pos.y - 1, player.pos.x - 1, '\\');
+
+}
+
+void erasePlayer(WINDOW* WIN){
+
+    mvwaddch(WIN, player.pos.y, player.pos.x, ' ');
+    mvwaddch(WIN, player.pos.y, player.pos.x - 1, ' ');
+    mvwaddch(WIN, player.pos.y + 1, player.pos.x - 1, ' ');
+    mvwaddch(WIN, player.pos.y - 1, player.pos.x - 1, ' ');
+
+}
 
 
 void updateScore(WINDOW* win, int num){
@@ -30,8 +77,6 @@ void mv_print_file(string file_loc, int y, int x){
     fin.close();
 }
 
-
-
 void displayIntroScr(){
     mv_print_file("src/introScr.txt",0,0);
     while (getch()!='p');
@@ -39,13 +84,18 @@ void displayIntroScr(){
 
 }
 
-void displayEndScr(){
+void displayDefScr(){
     nodelay(stdscr, false);
     clear();
-    mv_print_file("src/endScr.txt",0,0);
+    mv_print_file("src/defScr.txt",0,0);
 }
 
+void displayVicScr(){
 
+    nodelay(stdscr, false);
+    clear();
+    mv_print_file("src/vicScr.txt",0,0);
+}
 
 void CollisionCheck(){
 
@@ -83,6 +133,27 @@ void CollisionCheck(){
             }
         }
         
+        
+        if (isBoss == true)
+        {
+            
+            if (BulletList[i].player == true)
+            {
+                if (BulletList[i].pos.y <= BOSS_Y_COORDINATE_BOTTOM && BulletList[i].pos.x >= BOSS_Y_COORDINATE_TOP)
+                {
+                    
+                    if (BulletList[i].pos.x >= BOSS_X_COORDINATE_LEFT)
+                    {
+                        boss_health -= 1;
+                        BulletList[i].exist = false;
+                    }
+                
+                }
+                
+            }
+
+        }
+        
         if (BulletList[i].pos.y == player.pos.y && BulletList[i].player == false)
         {
             if (abs(player.pos.x - BulletList[i].pos.x)/BulletList[i].speed < 1){
@@ -92,10 +163,13 @@ void CollisionCheck(){
                 }
                 BulletList[i].exist = false;
                     
-                player.hp --;
+                player.hp--;
             }
         }
-        
+
+
+
+
     }
     
 }
@@ -111,7 +185,7 @@ void generateBullet(){
             BulletList[i].exist = true;
             BulletList[i].pos.x = player.pos.x + 1;
             BulletList[i].pos.y = player.pos.y;        
-            BulletList[i].symbol = '*';
+            BulletList[i].symbol = '>';
             BulletList[i].speed = 2;
             BulletList[i].player = true;
             break;
@@ -188,7 +262,7 @@ WINDOW* createNewWin(int height, int width, int starty, int startx, bool isDataW
     if (isDataWin == true)
     {
         int score = 0;
-        mvwprintw(localWin, 1, 1, "Score: %d",0);
+        mvwprintw(localWin, 1, 1, "SCORE: %d",0);
         starty += 2;
         startx += 2;
     }
@@ -204,18 +278,18 @@ void showTime(int second, WINDOW* win){
    if (minute/10 == 0)
    {
        if (second / 10== 0){
-        mvwprintw(win, 1, 68,"Time: 0%d:0%d",minute,second);
+        mvwprintw(win, 1, 68,"TIME: 0%d:0%d",minute,second);
         }
         else{
-            mvwprintw(win, 1, 68,"Time: 0%d:%d",minute,second);
+            mvwprintw(win, 1, 68,"TIME: 0%d:%d",minute,second);
         }  
    }
    else{
         if (second / 10== 0){
-        mvwprintw(win, 1, 68,"Time: %d:0%d",minute,second);
+        mvwprintw(win, 1, 68,"TIME: %d:0%d",minute,second);
         }
         else{
-            mvwprintw(win, 1, 68,"Time: %d:%d",minute,second);
+            mvwprintw(win, 1, 68,"TIME: %d:%d",minute,second);
         }
        
    }
@@ -239,12 +313,7 @@ int main(int argc, char const *argv[])
     int maxX, maxY;
 
     getmaxyx(stdscr,maxY,maxX); 
-    //mvprintw(0,0,"%d",maxY); //y=24
-   // mvprintw(1,1,"%d", maxX); //x=80
 
-
-
-         //wrefresh(MAIN);
     bool restart = true;
 
     while(restart == true){
@@ -270,12 +339,12 @@ int main(int argc, char const *argv[])
         player.pos.y = 5;
         player.symbol = 'E';
         player.hp = 10;
-        player.score = 0;
+        player.score = 500;
         char c;
         restart = false;
+
+        int numOfUltimate = 3;
         
-
-
         mvwaddch(MAIN,player.pos.y,player.pos.x,player.symbol);
         
 
@@ -283,7 +352,7 @@ int main(int argc, char const *argv[])
         srand(time(0));
         bool exit = false;
         int tick = 0;
-        int count = 0;
+        bool victory = false;
 
         for (int i = 0; i < MAX_NUM_ENEMY; i++)
         {
@@ -303,7 +372,6 @@ int main(int argc, char const *argv[])
         
         while (true)
         {   
-        
 
             usleep(50000);   // Frame rate approximately 50 fps
 
@@ -319,37 +387,44 @@ int main(int argc, char const *argv[])
             switch (input_key)
             {
             case 'w':
-                if (player.pos.y > MAIN_AREA.top + 1)
+                if (player.pos.y > MAIN_AREA.top + 2)
                 {
-                    mvwaddch(MAIN,player.pos.y,player.pos.x,' ');
+                    erasePlayer(MAIN);
                     player.pos.y -= 1;
                 }
                 break;
             
             case 's':
-                if (player.pos.y < MAIN_AREA.bot - 1)
+                if (player.pos.y < MAIN_AREA.bot - 2)
                 {
-                    mvwaddch(MAIN,player.pos.y,player.pos.x,' ');
+                    erasePlayer(MAIN);
                     player.pos.y += 1;
                 }
                 break;
             
             case 'a':
-                if (player.pos.x > MAIN_AREA.left + 2)
+                if (player.pos.x > MAIN_AREA.left + 3)
                 {
-                    mvwaddch(MAIN,player.pos.y,player.pos.x,' ');
-                    player.pos.x -= 2;
+                    erasePlayer(MAIN);
+                    player.pos.x -= 3;
                 }
                 break;
 
             case 'd':
-                if (player.pos.x < MAIN_AREA.right - 2)
+                if (player.pos.x < MAIN_AREA.right - 3)
                 {
-                    mvwaddch(MAIN,player.pos.y,player.pos.x,' ');
-                    player.pos.x += 2;
+                    erasePlayer(MAIN);
+                    player.pos.x += 3;
                 }
                 break;
-
+            
+            case 'r':
+                if (numOfUltimate > 0)
+                {
+                    ultimate(MAIN);
+                    numOfUltimate -= 1;
+                }
+                break;
             // Space key reflects ' '
             case ' ':
                 generateBullet();
@@ -370,7 +445,8 @@ int main(int argc, char const *argv[])
             updateBullet();
             CollisionCheck();
             updateScore(INFO,player.score);
-            mvwprintw(MAIN,1,2,"%d",player.hp);
+            mvwprintw(INFO,3,2,"%d",player.hp);
+            mvwprintw(INFO,4,2,"%d",base_health);
             if (tick % ENEMY_GEN_RATE == 0)
             {
                 generateEnemy();
@@ -379,31 +455,50 @@ int main(int argc, char const *argv[])
             printEnemy(MAIN);
             printBullet(MAIN);
 
-            if (exit) break;
-            mvwaddch(MAIN,player.pos.y,player.pos.x,player.symbol);
+            printPlayer(MAIN);
             
             wrefresh(MAIN);
             wrefresh(INFO);
 
             tick++;
 
-            if(player.hp == 0){
+            if(player.hp <= 0 || base_health == 0){
                 break;
             }
+            if (exit) break;
+
+            if(player.score >= 500){
+
+                printBoss(MAIN);
+                isBoss = true;
+                ENEMY_GEN_RATE = 20;
+
+                mvwprintw(INFO, 5, 2, "%d", boss_health);
+
+            }
+
+            if(boss_health == 0){
+                victory = true;
+                break;
+            }
+
         }
-        displayEndScr();
-        char b = getch();
-        if (b =='r'){
-            restart = true;
+        if (victory != true)
+        {
+            displayDefScr();
+            char b = getch();
+            if (b =='r'){
+                restart = true;
+            }
+        }else{
+
+            displayVicScr();
+            getch();
+
         }
-        wrefresh(MAIN);
         
     }
-        
-
-
-
-    getch();
+    
     endwin();
     return 0;
         

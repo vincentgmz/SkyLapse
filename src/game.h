@@ -1,7 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#define ENEMY_GEN_RATE 25
+extern int ENEMY_GEN_RATE;
+extern int base_health;
 #define MAX_NUM_ENEMY 10
 #define MAX_NUM_BULLET 100
 struct position

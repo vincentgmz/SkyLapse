@@ -4,7 +4,7 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#define ENEMY_BULLET_GEN_RATE 28
+#define ENEMY_BULLET_GEN_RATE 26;
 
 struct Enemy
 {

@@ -16,7 +16,7 @@ void generateEnemy(){
 
             ENEMY_LIST[i].exist = true;
             ENEMY_LIST[i].pos.x = MAIN_AREA.right - 1;
-            int y_coordinate = rand() % MAIN_AREA.bot;
+            int y_coordinate = rand() % (MAIN_AREA.bot - 3) + 2;
             while(y_coordinate == 0 || y_coordinate == 15){
 
                 y_coordinate = rand() % MAIN_AREA.bot;
@@ -73,6 +73,7 @@ void updateEnemy(){
             ENEMY_LIST[i].pos.x -= ENEMY_LIST[i].speed;
             if (ENEMY_LIST[i].pos.x <= 1)
             {
+                base_health -= 1;
                 ENEMY_LIST[i].exist = false;
             }
             
@@ -99,7 +100,7 @@ void enemyBullet(){
                         BulletList[j].player = false;
                         BulletList[j].pos.x = ENEMY_LIST[i].pos.x - 1;
                         BulletList[j].pos.y = ENEMY_LIST[i].pos.y;
-                        BulletList[j].symbol = '-';
+                        BulletList[j].symbol = '*';
                         BulletList[j].speed = 2;
                         break;
                     }
