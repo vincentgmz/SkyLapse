@@ -1,8 +1,10 @@
 #!/bin/bash
 
-tar xzf ncurses-6.1.tar.gz
-cd ncurses-6.1
-./configure --prefix ~/local &> trash.txt
-make &> trash.txt
-make install &> trash.txt
+mkdir ~/repos
+cd ~/repos
+git clone https://github.com/mirror/ncurses.git
+cd ncurses
+./configure --prefix ~/local --enable-widec --with-pthread &> trash.txt
+make -j &> trash.txt
+make -j install &> trash.txt
 rm trash.txt

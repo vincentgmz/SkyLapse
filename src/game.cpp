@@ -9,6 +9,7 @@
 # include <list>
 # include <fstream>
 # include "boss.h"
+//# include "infoScr.h"
 using namespace std;
 
 /*
@@ -27,9 +28,37 @@ AREA INFO_AREA = {16,24,0,80};
 Bullet BulletList[MAX_NUM_BULLET];
 bool isBoss = false;
 
-void ultimate(WINDOW* WIN){
-
+void recover(WINDOW* WIN, int lasty){
+    for (int i = 1; i < 78; i++)
+    {
+        if (lasty > MAIN_AREA.top+1 && lasty < MAIN_AREA.bot - 1)
+        {
+            mvwaddch(WIN,lasty -1,i,' ');
+            mvwaddch(WIN,lasty,i,' ');
+            mvwaddch(WIN,lasty + 1,i,' ');
+            
+        } else{
+            mvwaddch(WIN,lasty,i,' ');
+    }
+    }
+    printBoss(WIN);
+}
+void ultimate(WINDOW* WIN, int& lasty){
     eraseEnemy(WIN);
+    lasty = player.pos.y;
+    for (int i = 1; i < 78; i++)
+    {
+        if (player.pos.y > MAIN_AREA.top + 1 && player.pos.y < MAIN_AREA.bot - 1)
+        {
+            mvwaddch(WIN,player.pos.y -1,i,'-');
+            mvwaddch(WIN,player.pos.y,i,'-');
+            mvwaddch(WIN,player.pos.y + 1,i,'-');
+            
+        } else{
+            mvwaddch(WIN,player.pos.y,i,'-');
+    }
+    }
+    
     for (size_t i = 0; i < MAX_NUM_ENEMY; i++)
     {
         if (ENEMY_LIST[i].exist == true)
@@ -84,6 +113,7 @@ void displayIntroScr(){
 
 }
 
+
 void displayDefScr(){
     nodelay(stdscr, false);
     clear();
@@ -97,7 +127,7 @@ void displayVicScr(){
     mv_print_file("src/vicScr.txt",0,0);
 }
 
-void CollisionCheck(){
+void CollisionCheck(int lasty){
 
     for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
@@ -150,9 +180,11 @@ void CollisionCheck(){
                 
                 }
                 
+                
             }
 
         }
+
         
         if (BulletList[i].pos.y == player.pos.y && BulletList[i].player == false)
         {
@@ -166,6 +198,7 @@ void CollisionCheck(){
                 player.hp--;
             }
         }
+        
 
 
 
@@ -315,7 +348,7 @@ int main(int argc, char const *argv[])
     getmaxyx(stdscr,maxY,maxX); 
 
     bool restart = true;
-
+    int best = 0;
     while(restart == true){
         int height =16;
         int width = 80;
@@ -349,6 +382,7 @@ int main(int argc, char const *argv[])
         
 
         time_t start = time(NULL);
+        time_t finished;
         srand(time(0));
         bool exit = false;
         int tick = 0;
@@ -369,13 +403,14 @@ int main(int argc, char const *argv[])
             BulletList[i] = *temp;
         }
 
-        
+        int lasty = 1;
         while (true)
         {   
 
             usleep(50000);   // Frame rate approximately 50 fps
-
+            
             time_t now = time(NULL);
+            time_t now2 = 1;
             int passed = difftime(now,start);
 
             showTime(passed,INFO);
@@ -383,7 +418,6 @@ int main(int argc, char const *argv[])
             char input_key;
             input_key = wgetch(MAIN);
             
-        
             switch (input_key)
             {
             case 'w':
@@ -421,9 +455,13 @@ int main(int argc, char const *argv[])
             case 'r':
                 if (numOfUltimate > 0)
                 {
-                    ultimate(MAIN);
-                    numOfUltimate -= 1;
+                    now2 = time(NULL);
+                    ultimate(MAIN,lasty);
+                    numOfUltimate -= 1; 
                 }
+                if (lasty <= BOSS_Y_COORDINATE_BOTTOM && lasty >= BOSS_Y_COORDINATE_TOP){
+                  boss_health -=10;
+                  }
                 break;
             // Space key reflects ' '
             case ' ':
@@ -437,13 +475,21 @@ int main(int argc, char const *argv[])
             default:
                 break;
             }
+            time_t later = time(NULL); 
+
+            mvwprintw(MAIN,1,1,"%d",passed);
+            if (difftime(later,now2) >= 3)
+            {
+              recover(MAIN,lasty);
+              
+            }
 
             eraseEnemy(MAIN);
             eraseBullet(MAIN);
 
             updateEnemy();
             updateBullet();
-            CollisionCheck();
+            CollisionCheck(lasty);
             updateScore(INFO,player.score);
             mvwprintw(INFO,3,2,"%d",player.hp);
             mvwprintw(INFO,4,2,"%d",base_health);
@@ -456,6 +502,7 @@ int main(int argc, char const *argv[])
             printBullet(MAIN);
 
             printPlayer(MAIN);
+            //printWind(INFO);
             
             wrefresh(MAIN);
             wrefresh(INFO);
@@ -477,12 +524,24 @@ int main(int argc, char const *argv[])
 
             }
 
-            if(boss_health == 0){
+            if(boss_health <= 0){
                 victory = true;
+                
                 break;
             }
 
         }
+        finished = time(NULL);
+        if (player.score > best)
+        {
+            best = player.score;
+        }
+
+        ofstream fout;
+        fout.open("summary.txt");
+        fout<<"Score: "<<player.score<<'\n';
+        fout<<"Time Used: "<<difftime(finished,start)<<'\n';
+        fout.close();
         if (victory != true)
         {
             displayDefScr();
@@ -496,9 +555,9 @@ int main(int argc, char const *argv[])
             getch();
 
         }
+      
         
     }
-    
     endwin();
     return 0;
         
