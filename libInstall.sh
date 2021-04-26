@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p bin
-mkdir ~/repos
+mkdir -p ~/repos
 cd ~/repos
 git clone https://github.com/mirror/ncurses.git
 cd ncurses
