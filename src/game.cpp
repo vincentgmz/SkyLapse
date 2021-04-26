@@ -490,12 +490,15 @@ int main(int argc, char const *argv[])
             if (b =='r'){
                 restart = true;
             }
-        }else{
+        }
+        
+        else{
 
             displayVicScr();
             getch();
 
         }
+        
         
     }
     
