@@ -21,14 +21,64 @@ using namespace std;
 
 */
 int base_health = 10;
-int ENEMY_GEN_RATE = 25;
+int ENEMY_GEN_RATE = 27; // rate of generating enemies
 int boss_health = 50;
 AREA MAIN_AREA = {0,15,0,79};
 AREA INFO_AREA = {16,24,0,80};
 Bullet BulletList[MAX_NUM_BULLET];
 bool isBoss = false;
+int numOfUltimate = 3;
+
+void printInfo(WINDOW* win, int health, int numUltimate, int bossHealth, int base_health){
+    //prints player's health points, num of ultimate, base health and Boss's health in form of ascii char
+
+    // cleans up everything before printing out those values
+    for (int i = 11; i < 11+10; i++)
+    {
+        mvwaddch(win,2,i,' ');
+    }
+    for (int i = 11; i < 20 ; i++)
+    {
+        mvwaddch(win,3,i,' ');
+    }
+    for (int i = 11; i <21 ; i++)
+    {
+        mvwaddch(win,4,i,' ');
+    }
+    for (int i = 11; i < 28; i++)
+    {
+        mvwaddch(win,5,i,' ');
+    }
+    
+    
+    //print the current values 
+    mvwprintw(win,2,8,"HP: ");
+    for (int i = 11; i < 11+health; i++)
+    {
+        mvwaddch(win,2,i,'/');
+    }
+    mvwprintw(win,3,8,"Ult: ");
+    for (int i = 13; i < 13 + numUltimate; i++)
+    {
+        mvwaddch(win,3,i,'#');
+    }
+    mvwprintw(win,4,8,"Boss: ");
+    for (int i = 14; i < 14+ bossHealth / 10 + 1; i++)
+    {
+        mvwaddch(win,4,i,'/');
+    }
+    mvwprintw(win,5,8,"Base_HP: ");
+    for (int i = 17; i < 17 + base_health; i++)
+    {
+        mvwaddch(win,5,i,'/');
+    }
+    
+
+}
 
 void recover(WINDOW* WIN, int lasty){
+    // after making ultimate attacks, some chars will be lost
+    //this ensures nothing lost
     for (int i = 1; i < 78; i++)
     {
         if (lasty > MAIN_AREA.top+1 && lasty < MAIN_AREA.bot - 1)
@@ -41,9 +91,14 @@ void recover(WINDOW* WIN, int lasty){
             mvwaddch(WIN,lasty,i,' ');
     }
     }
+    //print boss again to ensure details of the boss is not lost.
+    if(isBoss == true){
     printBoss(WIN);
+    }
 }
+
 void ultimate(WINDOW* WIN, int& lasty){
+    // making ultimate attack in form of laser beam with length of 3 y units. 
     eraseEnemy(WIN);
     lasty = player.pos.y;
     for (int i = 1; i < 78; i++)
@@ -58,7 +113,7 @@ void ultimate(WINDOW* WIN, int& lasty){
             mvwaddch(WIN,player.pos.y,i,'-');
     }
     }
-    
+    // for any enemy that exists currently, they will die immediately and you score 10* numofEnemy
     for (size_t i = 0; i < MAX_NUM_ENEMY; i++)
     {
         if (ENEMY_LIST[i].exist == true)
@@ -96,6 +151,7 @@ void updateScore(WINDOW* win, int num){
 }
 
 void mv_print_file(string file_loc, int y, int x){
+    //file input: to read our carefully designed introduction page and end page. 
     ifstream fin;
     fin.open(file_loc);
     string str;
@@ -115,20 +171,21 @@ void displayIntroScr(){
 
 
 void displayDefScr(){
+    //displays the ending page
     nodelay(stdscr, false);
     clear();
     mv_print_file("src/defScr.txt",0,0);
 }
 
 void displayVicScr(){
-
+    //displays the victory page
     nodelay(stdscr, false);
     clear();
     mv_print_file("src/vicScr.txt",0,0);
 }
 
 void CollisionCheck(int lasty){
-
+    // checks collision
     for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
 
@@ -141,7 +198,7 @@ void CollisionCheck(int lasty){
             if (ENEMY_LIST[j].exist == false){
                 continue;
             }
-
+            // player kills one enemy when the bullet and enemy share the same row.
             if (ENEMY_LIST[j].pos.y == BulletList[i].pos.y && BulletList[i].player == true)
             {
                 if (abs(ENEMY_LIST[j].pos.x - BulletList[i].pos.x) / BulletList[i].speed < 1)
@@ -152,10 +209,10 @@ void CollisionCheck(int lasty){
                 }
                 
             }
-
+            // enemy and player at the same location
             if (abs(ENEMY_LIST[j].pos.x - player.pos.x) == 0 && ENEMY_LIST[j].pos.y == player.pos.y)
             {
-                player.hp = 0;
+                player.hp = 0;  //dies directly
                 if (player.hp == 0)
                 {
                     player.symbol = ' ';
@@ -164,7 +221,7 @@ void CollisionCheck(int lasty){
         }
         
         
-        if (isBoss == true)
+        if (isBoss == true) // player's bullet between the size of the boss attacks the boss. 
         {
             
             if (BulletList[i].player == true)
@@ -185,7 +242,7 @@ void CollisionCheck(int lasty){
 
         }
 
-        
+        // when enemy's bullet coincides with the player, player's hp reduces by 1
         if (BulletList[i].pos.y == player.pos.y && BulletList[i].player == false)
         {
             if (abs(player.pos.x - BulletList[i].pos.x)/BulletList[i].speed < 1){
@@ -210,6 +267,8 @@ void CollisionCheck(int lasty){
 
 void generateBullet(){
 
+    // generate bullet
+
     for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
         
@@ -229,6 +288,7 @@ void generateBullet(){
 }
 
 void printBullet(WINDOW* WIN){
+    //print bullet
 
     for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
@@ -243,6 +303,8 @@ void printBullet(WINDOW* WIN){
 }
 
 void updateBullet(){
+
+    //if bullet out of boundary, make it disappear
 
     for (int i = 0; i < MAX_NUM_BULLET; i++)
     {
@@ -268,6 +330,8 @@ void updateBullet(){
     }
     
 }
+
+
 
 void eraseBullet(WINDOW* WIN){
 
@@ -305,7 +369,9 @@ WINDOW* createNewWin(int height, int width, int starty, int startx, bool isDataW
 }
 
 
+
 void showTime(int second, WINDOW* win){
+    // timer
    int minute = second / 60;
    second %= 60;
    if (minute/10 == 0)
@@ -333,14 +399,14 @@ void showTime(int second, WINDOW* win){
 
 int main(int argc, char const *argv[])
 {
-    initscr();
+    initscr();      //initial setup
     refresh();
     cbreak();
-    noecho();
+    noecho();    
     curs_set(0);
     keypad(stdscr,true);
 
-    displayIntroScr();
+    displayIntroScr(); 
 
     nodelay(stdscr,true);
     int maxX, maxY;
@@ -349,8 +415,11 @@ int main(int argc, char const *argv[])
 
     bool restart = true;
     int best = 0;
+
+    // if fails, player can choose to restart or not
+    // if wins, jump to victory page
     while(restart == true){
-        int height =16;
+        int height =16;     //parameter for the two windows
         int width = 80;
         int starty = 0;
         int startx = 0;
@@ -372,17 +441,16 @@ int main(int argc, char const *argv[])
         player.pos.y = 5;
         player.symbol = 'E';
         player.hp = 10;
-        player.score = 500;
+        player.score = 0;
         char c;
         restart = false;
 
-        int numOfUltimate = 3;
         
         mvwaddch(MAIN,player.pos.y,player.pos.x,player.symbol);
         
 
-        time_t start = time(NULL);
-        time_t finished;
+        time_t start = time(NULL); // starting time
+        time_t finished; // ending time
         srand(time(0));
         bool exit = false;
         int tick = 0;
@@ -416,9 +484,9 @@ int main(int argc, char const *argv[])
             showTime(passed,INFO);
 
             char input_key;
-            input_key = wgetch(MAIN);
+            input_key = wgetch(MAIN);   
             
-            switch (input_key)
+            switch (input_key)  // wasd to control trajectory of player's airplane
             {
             case 'w':
                 if (player.pos.y > MAIN_AREA.top + 2)
@@ -478,7 +546,7 @@ int main(int argc, char const *argv[])
             time_t later = time(NULL); 
 
             mvwprintw(MAIN,1,1,"%d",passed);
-            if (difftime(later,now2) >= 3)
+            if (difftime(later,now2) >= 3)  // recovers to the normal page after three seconds of laser beam emission/ultimate. 
             {
               recover(MAIN,lasty);
               
@@ -491,8 +559,7 @@ int main(int argc, char const *argv[])
             updateBullet();
             CollisionCheck(lasty);
             updateScore(INFO,player.score);
-            mvwprintw(INFO,3,2,"%d",player.hp);
-            mvwprintw(INFO,4,2,"%d",base_health);
+            printInfo(INFO, player.hp, numOfUltimate, boss_health,base_health);
             if (tick % ENEMY_GEN_RATE == 0)
             {
                 generateEnemy();
@@ -502,7 +569,7 @@ int main(int argc, char const *argv[])
             printBullet(MAIN);
 
             printPlayer(MAIN);
-            //printWind(INFO);
+
             
             wrefresh(MAIN);
             wrefresh(INFO);
@@ -518,9 +585,7 @@ int main(int argc, char const *argv[])
 
                 printBoss(MAIN);
                 isBoss = true;
-                ENEMY_GEN_RATE = 20;
-
-                mvwprintw(INFO, 5, 2, "%d", boss_health);
+                ENEMY_GEN_RATE = 25;
 
             }
 
@@ -536,7 +601,7 @@ int main(int argc, char const *argv[])
         {
             best = player.score;
         }
-
+        // file output: a summary of performace
         ofstream fout;
         fout.open("summary.txt");
         fout<<"Score: "<<player.score<<'\n';
@@ -546,6 +611,9 @@ int main(int argc, char const *argv[])
         {
             displayDefScr();
             char b = getch();
+            while (b != 'q' && b != 'r'){
+                b = getch();
+            }
             if (b =='r'){
                 restart = true;
             }
@@ -554,7 +622,8 @@ int main(int argc, char const *argv[])
         else{
 
             displayVicScr();
-            getch();
+
+            while(getch() != 'q');
 
         }
       

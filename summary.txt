@@ -1,3 +1,2 @@
-Score: 500
+Score: 540
 Time Used: 5
-Best Score: 500

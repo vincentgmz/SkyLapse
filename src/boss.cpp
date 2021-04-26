@@ -9,6 +9,7 @@
 using namespace std;
 
 void mvw_print_file(WINDOW* WIN,string file_loc, int y, int x){
+    //read the shape of boss in ascii chars
     ifstream fin;
     fin.open(file_loc);
     string str;

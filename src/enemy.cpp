@@ -6,7 +6,12 @@
 
 Enemy ENEMY_LIST[MAX_NUM_ENEMY];
 
+
+// This cpp file is about creating,printing, erasing,updating enemies and creating their bullets
+
+//generates Enemy randomly
 void generateEnemy(){
+
 
     srand(time(0));
     for (int i = 0; i < MAX_NUM_ENEMY; i++)
@@ -15,7 +20,7 @@ void generateEnemy(){
         if (ENEMY_LIST[i].exist == false){
 
             ENEMY_LIST[i].exist = true;
-            ENEMY_LIST[i].pos.x = MAIN_AREA.right - 1;
+            ENEMY_LIST[i].pos.x = MAIN_AREA.right - 1; 
             int y_coordinate = rand() % (MAIN_AREA.bot - 3) + 2;
             while(y_coordinate == 0 || y_coordinate == 15){
 
@@ -32,6 +37,7 @@ void generateEnemy(){
 }
 
 void printEnemy(WINDOW* WIN){
+    //prints enemy
 
     for (int i = 0; i < MAX_NUM_ENEMY; i++)
     {
@@ -48,6 +54,7 @@ void printEnemy(WINDOW* WIN){
 }
 
 void eraseEnemy(WINDOW* WIN){
+    //erases enemy
 
     for (int i = 0; i < MAX_NUM_ENEMY; i++)
     {
@@ -65,6 +72,8 @@ void eraseEnemy(WINDOW* WIN){
 
 
 void updateEnemy(){
+
+    //updates enemy
 
     for (int i = 0; i < MAX_NUM_ENEMY; i++)
     {
@@ -85,13 +94,15 @@ void updateEnemy(){
 
 void enemyBullet(){
 
+    //create enemy bullets
+
     for (int i = 0; i < MAX_NUM_ENEMY; i++)
     {
         if (ENEMY_LIST[i].exist == true)
         {
             
             int random_number = rand() % ENEMY_BULLET_GEN_RATE;
-            if (random_number == 1)
+            if (random_number == 1)   // random num is 1 emit bullets
             {
                 for (int j = 0; j < MAX_NUM_BULLET; j++)
                 {
