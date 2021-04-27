@@ -14,8 +14,7 @@ bin/enemy.o: src/enemy.cpp src/enemy.h
 bin/boss.o : src/boss.cpp
 	g++ -I ~/local/include -I ~/local/include/ncursestw -L ~/local/lib  -c -o bin/boss.o src/boss.cpp -lncursestw -ldl -pthread
 
-bin/info.o: src/info.cpp src/boss.h
-	g++ -I ~/local/include -I ~/local/include/ncursestw -L ~/local/lib  -c -o bin/
+
 
 
 clean :
