@@ -8,7 +8,6 @@ Enemy ENEMY_LIST[MAX_NUM_ENEMY];
 
 
 // This cpp file is about creating,printing, erasing,updating enemies and creating their bullets
-
 //generates Enemy randomly
 void generateEnemy(){
 
@@ -22,7 +21,8 @@ void generateEnemy(){
             ENEMY_LIST[i].exist = true;
             ENEMY_LIST[i].pos.x = MAIN_AREA.right - 1; 
             int y_coordinate = rand() % (MAIN_AREA.bot - 3) + 2;
-            while(y_coordinate == 0 || y_coordinate == 15){
+            while(y_coordinate == 0 || y_coordinate == 15){ //regenerate y-coordinate if it overlaps with 
+                                                            //the top and bottom of the main window
 
                 y_coordinate = rand() % MAIN_AREA.bot;
 
@@ -36,8 +36,10 @@ void generateEnemy(){
 
 }
 
+//prints enemy
+// input: the MAIN window
 void printEnemy(WINDOW* WIN){
-    //prints enemy
+
 
     for (int i = 0; i < MAX_NUM_ENEMY; i++)
     {
@@ -53,8 +55,9 @@ void printEnemy(WINDOW* WIN){
     wrefresh(WIN);
 }
 
+//erases enemy
+// input: the MAIN window
 void eraseEnemy(WINDOW* WIN){
-    //erases enemy
 
     for (int i = 0; i < MAX_NUM_ENEMY; i++)
     {
@@ -71,11 +74,12 @@ void eraseEnemy(WINDOW* WIN){
 }
 
 
+
+//updates enemies' positions, whether they are alive or dead , and their effects to base_health
 void updateEnemy(){
 
-    //updates enemy
 
-    for (int i = 0; i < MAX_NUM_ENEMY; i++)
+ for (int i = 0; i < MAX_NUM_ENEMY; i++)
     {
         if (ENEMY_LIST[i].exist == true)
         {
@@ -92,9 +96,8 @@ void updateEnemy(){
 
 }
 
+//create enemy bullets denoted as '*' for each enemy. 
 void enemyBullet(){
-
-    //create enemy bullets
 
     for (int i = 0; i < MAX_NUM_ENEMY; i++)
     {
@@ -102,7 +105,7 @@ void enemyBullet(){
         {
             
             int random_number = rand() % ENEMY_BULLET_GEN_RATE;
-            if (random_number == 1)   // random num is 1 emit bullets
+            if (random_number == 1)  
             {
                 for (int j = 0; j < MAX_NUM_BULLET; j++)
                 {

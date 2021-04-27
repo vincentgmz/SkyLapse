@@ -1,6 +1,7 @@
 #ifndef BOSS_H
 #define BOSS_H
 #include <ncurses.h>
+#include <string>
 
 #define BOSS_Y_COORDINATE_TOP 5
 #define BOSS_Y_COORDINATE_BOTTOM 11
@@ -12,5 +13,7 @@ using namespace std;
 extern int boss_health;
 
 void printBoss(WINDOW* WIN);
+void cleanBoss(WINDOW* WIN);
+
 
 #endif
