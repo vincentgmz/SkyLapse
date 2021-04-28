@@ -1,11 +1,12 @@
 #!/bin/bash
 
+PWD=`pwd`
+
+mkdir -p lib
 mkdir -p bin
-mkdir -p ~/repos
-cd ~/repos
-git clone https://github.com/mirror/ncurses.git
+unzip ncurses
 cd ncurses
-./configure --prefix ~/local --enable-widec --with-pthread &> trash.txt
+./configure --prefix $PWD/lib --enable-widec --with-pthread &> trash.txt
 make -j &> trash.txt
 make -j install &> trash.txt
 rm trash.txt
